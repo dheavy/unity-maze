@@ -6,6 +6,8 @@ public class Maze : MonoBehaviour
 {
     public IntVector2 size;
     public MazeCell cellPrefab;
+    public MazePassage passagePrefab;
+    public MazeWall wallPrefab;
     public float generationStepDelay;
 
     private MazeCell[,] cells;
