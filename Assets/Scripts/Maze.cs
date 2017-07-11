@@ -56,10 +56,40 @@ public class Maze : MonoBehaviour
         MazeCell currentCell = activeCells[currentIndex];
         MazeDirection direction = MazeDirections.RandomValue;
         IntVector2 coordinates = currentCell.coordinates + direction.ToIntVector2();
-        if (ContainsCoordinates(coordinates) && GetCell(coordinates) == null) {
-            activeCells.Add(CreateCell(coordinates));
+
+        if (ContainsCoordinates(coordinates)) {
+            MazeCell neighbor = GetCell(coordinates);
+
+            if (neighbor == null) {
+                neighbor = CreateCell(coordinates);
+                CreatePassage(currentCell, neighbor, direction);
+                activeCells.Add(neighbor);
+            } else {
+                CreateWall(currentCell, neighbor, direction);
+                activeCells.RemoveAt(currentIndex);
+            }
         } else {
+            CreateWall(currentCell, null, direction);
             activeCells.RemoveAt(currentIndex);
+        }
+    }
+
+    private void CreatePassage (MazeCell cell, MazeCell otherCell, MazeDirection direction)
+    {
+        MazePassage passage = Instantiate<MazePassage>(passagePrefab);
+        passage.Initialize(cell, otherCell, direction);
+        passage = Instantiate<MazePassage>(passagePrefab);
+        passage.Initialize(otherCell, cell, direction.GetOpposite());
+    }
+
+    private void CreateWall (MazeCell cell, MazeCell otherCell, MazeDirection direction)
+    {
+        MazeWall wall = Instantiate<MazeWall>(wallPrefab);
+        wall.Initialize(cell, otherCell, direction);
+
+        if (otherCell != null) {
+            wall = Instantiate<MazeWall>(wallPrefab);
+            wall.Initialize(otherCell, cell, direction.GetOpposite());
         }
     }
 
